@@ -79,7 +79,10 @@ class DB_sql {
 		}else if(!is_array($values)){
 			$values = array($values);
 		}
+
 		$stmt = $this->execute($query, $values);
+
+
 		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 		// Allows the user to retrieve results using a
@@ -98,6 +101,19 @@ class DB_sql {
 		return $this->pdo->lastInsertId();
 	}
 
+	function sp_getealumnosactivos($data){
+
+		$query = "SELECT a.*, g.nombre as genero, CONCAT(a.nombre,' ',a.appat,' ',a.apmat) as nomcompleto FROM alumnos a INNER JOIN generos g ON g.ID=a.generos_id WHERE a.estatus<90 ORDER BY a.matricula ASC";
+		return $this->consulta($query);
+	}
+
+	function sp_getealumnosbyid($data){
+
+
+		$query =  "SELECT a.*, g.nombre as genero FROM alumnos a INNER JOIN generos g ON g.ID=a.generos_id WHERE a.estatus<90 AND a.id=".$data['id'];
+
+		return $this->consulta($query);
+	}
 
 	function sp_savealumnos($data){
 
@@ -111,7 +127,7 @@ class DB_sql {
 		$stmt->bindParam(5, $data['fecnac']); 
 		$stmt->bindParam(6, $data['genero']); 
 		$stmt->bindParam(7, $data['grado']); 
-		$stmt->bindParam(7, $data['matricula']); 
+		$stmt->bindParam(8, $data['matricula']); 
 		
 
 		// call the stored procedure
@@ -131,7 +147,7 @@ class DB_sql {
 	function sp_deletealumnos($data){
 
 		$stmt = $this->pdo->prepare("CALL deletealumnos(?)");
-		$stmt->bindParam(1, $data->id, PDO::PARAM_INT); 
+		$stmt->bindParam(1, $data['id']); 
 		
 		// call the stored procedure
 		$stmt->execute();
@@ -153,14 +169,17 @@ class DB_sql {
 		// call the stored procedure
 		$stmt->execute();
 		$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		if($key != null && $results[0][$key]){
-			$keyed_results = array();
-			foreach($results as $result){
-				$keyed_results[$result[$key]] = $result;
-			}
-			$results = $keyed_results;
-		}
+	
 		return $results;
+	}
+
+	function sp_search($data){
+		$query = $query =  "SELECT a.*, g.nombre as genero FROM alumnos a INNER JOIN generos g ON g.ID=a.generos_id WHERE a.estatus<90";
+		
+		if(isset($data['key'])){
+			$query .= " AND ".$data['key']."=".$data['value'];
+		}
+		return $this->consulta($query);
 	}
 
 	function changeDateFormat($var){

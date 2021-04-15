@@ -1,6 +1,6 @@
 $(function($) {
 
- $hostMaster = "http://localhost:8888/redefectiva/api";
+		$hostMaster = "http://localhost:8888/redefectiva/api";
 
  	    $("#form-nalumno").submit(function(e) {
 	        
@@ -28,7 +28,8 @@ $(function($) {
 	            dataType: 'json',
 	            contentType: 'application/json',
 	            data : JSON.stringify({
-	                action : 'save_alumno',
+	            	object : "alumno",
+	                action : 'save',
 	                matricula: matricula.val(),
 	                nombre : nombre.val(),
 	                appat : appat.val(),
@@ -81,5 +82,136 @@ $(function($) {
 	            	}
 	            }
 	        });
+	    });
+
+
+
+ 	    //Funcionalidad de tabla principal
+ 	    if ( $('#lista-alumnos').length ) {
+	    	var ft = FooTable.init('.table_alumnos', {
+	            "useParentWidth": false,
+	            "showToggle": false,
+	            "paging": { "enabled": true },
+	            "sorting": { "enabled": true },
+	            "showHeader": true,
+	            "editing": {
+	                //enabled: false,
+	                //alwaysShow: false,
+	                
+	                //allowAdd: false,
+	                
+	                showText: '<span class="fa fa-pencil" aria-hidden="true"></span> Editar Alumnos',
+	                hideText: "Cancelar",
+	                
+	                addText: '<i class="fa fa-plus" aria-hidden="true"></i>Agregar Alumno',
+
+	                allowEdit: true,
+	                editText: '<i class="fa fa-pencil" aria-hidden="true"></i>',
+
+	                allowDelete: true,
+	                deleteText: '<i class="fa fa-trash" aria-hidden="true"></i>',
+	                addRow: function(row){
+	                    window.location.href = 'registro.php';
+	                },
+	                editRow: function(row){
+	                    var values = row.val();
+	                    window.location.href = 'registro.php?alumnoid='+values.id;
+	                },
+	                deleteRow: function(row){
+
+	                    var values = row.val();
+
+	                    if (confirm('¿Estás seguro de que deseas eliminar de forma permanente este alumno?')){
+	                        
+	                        $.ajax({
+	                            url : $hostMaster+'/api.php',
+	                            type : 'post',
+	                            dataType: 'json',
+	                            contentType: 'application/json',
+	                            data : JSON.stringify({
+	                            	object : "alumno",
+	                                action : 'delete',
+	                                id: values.id
+	                            }),
+	                            beforeSend: function(){ },
+	                            success : function( data ) {
+
+	                                if (data.error) {
+	                                    $.toast({ loader: true, heading: 'Error', text: data.message, icon: 'error'})
+	                                } else {
+	                                    $.toast({loader: true, heading: 'Éxito', text: data.message, icon: 'success', showHideTransition: 'fade'})
+	                                    row.delete();
+	                                }
+	                            }
+	                        });
+
+	                    }
+	                }
+	            },
+	            "column": {
+	                "classes": "footable-editing",
+	                "name": "editing",
+	                "title": "ACCIONES",
+	                "filterable": true,
+	                "sortable": true
+	            },
+	            "columns": $.getJSON($hostMaster +"/api.php?object=alumno&action=columns"),
+	            "rows": $.getJSON($hostMaster +"/api.php?object=alumno&action=getActivos")
+	        });
+
+	        ///////////////////////////////////////////////
+	        $("#form-ver-listxgrupo").submit(function(e) {
+	        
+		        e.preventDefault();
+
+		        var button = $(this).find('button[type="submit"]');
+		        var grado = $(this).find('input[name="grado"]');
+
+		        if(grado.val()==undefined || grado.val()<=0)
+		        {
+		        	$.toast({ loader: true, 
+	                                heading: 'Warning', 
+	                                text: 'Favor de ingresar el grado que desea buscar', 
+	                                icon: 'warning',
+	                                afterHidden: function () 
+	                                {
+	                                    grado.focus();
+	                                }
+	                            });
+		        	return false;
+		        }
+
+		        var form = $('.needs-validation')
+		            form.removeClass('was-validated');
+
+		        $.get($hostMaster+"/api.php?object=alumno&action=search&key=grado_ingresar&value="+grado.val()).then(function (rows) {
+	           
+	                ft.loadRows(rows, false);
+
+	                $("#titleDasboard").html("Alumnos de "+grado.val()+" grado");
+	                console.log($("#cancelSearch").hasClass("d-none"));
+	                if($("#cancelSearch").hasClass("d-none")==true)
+	                	$("#cancelSearch").toggleClass("d-none d-inline-block");
+	        
+	            });
+
+		        
+		    });
+	    }
+
+	    $("#cancelSearch").click(function(e){
+	    	e.preventDefault();
+	    	$("#titleDasboard").html("Alumnos");
+	    	$("#cancelSearch").toggleClass("d-inline-block d-none");
+
+	    	var grado = $("#grado");
+	        grado.val('');
+
+	    	$.get($hostMaster+"/api.php?object=alumno&action=getActivos").then(function (rows) {
+	           
+	                ft.loadRows(rows, false);
+
+	        });
+
 	    });
 });

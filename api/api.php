@@ -12,12 +12,13 @@ header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Ac
 $data = json_decode(file_get_contents('php://input'), TRUE);
 
 require_once("include/config.php");
+require_once("include/ObjectColumns.php");
 
 $conexion = new DB_sql();
 $conexion->conectar("", "", "", "");
 
 
-
+$objectscolumns = new ObjectsColumns();
 
 
 $response = array();
@@ -47,14 +48,40 @@ if(empty($data)){
 
 
 
-if($data['action'] == 'save_alumno'){
-    $response =  $conexion->sp_savealumnos($data) ;
-}
-else if($data['action'] == 'delete_alumno'){
-    $response =  $conexion->sp_deletealumnos($data) ;
-}
-else if($data['action'] == 'get_generos'){
-	$response =  $conexion->sp_getGeneros($data) ;
+if(isset($data['object'])){
+    switch ($data['object']) {
+        case 'alumno':
+            switch ($data['action']) {
+                case 'new':
+                case 'save':
+                    $response =  $conexion->sp_savealumnos($data) ;
+                break;
+                case 'delete':
+                    $response =  $conexion->sp_deletealumnos($data) ;
+                break;
+                 case 'getActivos':
+                    $response =  $conexion->sp_getealumnosactivos($data) ;
+                break;
+                case 'get_alumno':
+                    $response =  $conexion->sp_getealumnosbyid($data) ;
+                break;
+                case 'search':
+                    $response =  $conexion->sp_search($data) ;
+                break;
+                case 'columns':
+                    $response =  $objectscolumns->get_alumnos();
+                break;
+            }
+        break;
+        case 'genero':
+            switch ($data['action']) {
+                case 'get':
+                    $response =  $conexion->sp_getGeneros($data) ;
+                break;
+            }
+        break;
+    }
+
 }
 
 echo json_encode($response);
