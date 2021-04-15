@@ -88,7 +88,20 @@
 						</ul>
 					</li>
 				</ul>
+			<p class="lead">Documentos</p>
+				<ul>
+					
+					<li><a href="docs/Examen PHP-MySQL-Inscripcion alumnos.pdf">Requisitos Evaluación QA-MySQL</a></li>
+					<li><a href="docs/redefectivaeval.sql">Script de Base de datos</a></li>
+					<li><a href="docs/redefectivaeval.mwb">Modelo entidad relación en Workbench</a></li>
+					<li><a href="https://bitbucket.org/ferllanas2017/redefectiva">Repositorio Bitbucket</a>
+					<li><a href="https://github.com/ferllanas/redefectiva.git">Repositorio Github</a>
+						
+				</ul>
 			<p class="lead">APP <a href="app/">Click aquí para empezar</a></p>
+
+			<p class="lead ">Nota: </p>
+			<p>El desarrollo de este proyecto en la parte del frontend se ha ralizado haciendo uso de php y javascript, el api(backend) es totalmente php y se utiliza conexion a base de datos por medio de pdo.</p>
 		</div>
 	</main>
 	<!-- main -->

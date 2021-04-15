@@ -1,3 +1,17 @@
+body{
+	font-size: 12px;
+}
+
+.btn-primary,.btn-default{
+	margin: 2px;
+	font-size: 12px;
+}
+
+.btn-default{
+	background-color: gray;
+	color: white;
+}
+
 .container {
 			    width: auto;
 			    max-width: 680px;

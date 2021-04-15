@@ -174,12 +174,26 @@ class DB_sql {
 	}
 
 	function sp_search($data){
-		$query = $query =  "SELECT a.*, g.nombre as genero FROM alumnos a INNER JOIN generos g ON g.ID=a.generos_id WHERE a.estatus<90";
+		$query = $query =  "SELECT a.*, g.nombre as genero, CONCAT(a.nombre,' ',a.appat,' ',a.apmat) as nomcompleto FROM alumnos a INNER JOIN generos g ON g.ID=a.generos_id  ";
 		
-		if(isset($data['key'])){
-			$query .= " AND ".$data['key']."=".$data['value'];
+		if(isset($data['keys'])){
+
+            $keys = str_replace("'", '"', $data['keys']) ;
+            $keysArray = json_decode($keys);
+            $count=0;
+			foreach ($keysArray as $key => $value) {
+				# code...
+				if($count==0)
+					$query .= " WHERE ".$key."=".$value;
+				else
+					$query .= " AND ".$key."=".$value;
+				$count++;
+			}
 		}
-		return $this->consulta($query);
+
+		$response['alumnos'] = $this->consulta($query);
+		$response['cantidad'] = count($response['alumnos']);
+		return $response;
 	}
 
 	function changeDateFormat($var){

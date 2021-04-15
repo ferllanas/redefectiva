@@ -97,9 +97,7 @@ $(function($) {
 	            "editing": {
 	                //enabled: false,
 	                //alwaysShow: false,
-	                
-	                //allowAdd: false,
-	                
+	                allowAdd: true,
 	                showText: '<span class="fa fa-pencil" aria-hidden="true"></span> Editar Alumnos',
 	                hideText: "Cancelar",
 	                
@@ -166,6 +164,7 @@ $(function($) {
 
 		        var button = $(this).find('button[type="submit"]');
 		        var grado = $(this).find('input[name="grado"]');
+		        var estatus = $(this).find('select[name="estatus"]');
 
 		        if(grado.val()==undefined || grado.val()<=0)
 		        {
@@ -184,11 +183,12 @@ $(function($) {
 		        var form = $('.needs-validation')
 		            form.removeClass('was-validated');
 
-		        $.get($hostMaster+"/api.php?object=alumno&action=search&key=grado_ingresar&value="+grado.val()).then(function (rows) {
-	           
-	                ft.loadRows(rows, false);
 
-	                $("#titleDasboard").html("Alumnos de "+grado.val()+" grado");
+		        $.get($hostMaster+"/api.php?object=alumno&action=search&keys={'grado_ingresar':"+grado.val()+",'estatus':"+estatus.val()+"}").then(function (rows) {
+	           		
+	                ft.loadRows(rows['alumnos'], false);
+
+	                $("#titleDasboard").html(rows['cantidad']+" Alumno(s) de "+grado.val()+" grado");
 	                console.log($("#cancelSearch").hasClass("d-none"));
 	                if($("#cancelSearch").hasClass("d-none")==true)
 	                	$("#cancelSearch").toggleClass("d-none d-inline-block");
@@ -208,8 +208,9 @@ $(function($) {
 	        grado.val('');
 
 	    	$.get($hostMaster+"/api.php?object=alumno&action=getActivos").then(function (rows) {
-	           
-	                ft.loadRows(rows, false);
+	           		
+
+	                ft.loadRows(rows['alumnos'], false);
 
 	        });
 
